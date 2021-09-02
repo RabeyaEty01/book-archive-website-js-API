@@ -68,18 +68,18 @@ const displaySearchResult = docs => {
         noResultFound.appendChild(p);
 
     }
-   else{
-    const totalResultFound = document.getElementById('empty-text');
-    totalResultFound.textContent = '';
-    const p = document.createElement('p');
-    p.innerText = `Total result Found ${docs.length}
+    else {
+        const totalResultFound = document.getElementById('empty-text');
+        totalResultFound.textContent = '';
+        const p = document.createElement('p');
+        p.innerText = `Total result Found ${docs.length}
    `;
-    p.style.fontSize = '30px';
-    p.style.color = 'blue';
-    p.style.textAlign = 'center';
-    totalResultFound.appendChild(p);
-    searchResult.textContent = '';
-   }
+        p.style.fontSize = '30px';
+        p.style.color = 'blue';
+        p.style.textAlign = 'center';
+        totalResultFound.appendChild(p);
+        searchResult.textContent = '';
+    }
     docs.forEach(doc => {
         //console.log(doc);
 
@@ -87,12 +87,11 @@ const displaySearchResult = docs => {
         div.classList.add('col');
 
         div.innerHTML = `
-       <div class="card h-75 img-fluid">
-       <img src="https://covers.openlibrary.org/b/id/${doc.cover_i?doc.cover_i:''}-M.jpg" alt="">
+       <div onclick="loadMealDetail('${doc.author_key}')" class="card h-75 img-fluid rounded-3">
+       <img src="https://covers.openlibrary.org/b/id/${doc.cover_i ? doc.cover_i : ''}-M.jpg" alt="">
           <div class="card-body">
-              <h5 class="card-title">${doc.title}</h5>
-              <span>By ${doc.author_name ? doc.author_name : ''} </span>
-              <br>
+              <h1 class="card-title">${doc.title}</h1>
+              <h6>By ${doc.author_name ? doc.author_name : ''} </h6>
               <span>Publisher: ${doc.publisher ? doc.publisher : ''}</span>
               <br>
               <span>First Publish in ${doc.first_publish_year ? doc.first_publish_year : ''}</span>
@@ -103,4 +102,39 @@ const displaySearchResult = docs => {
     });
     toggleSpinner('none');
     toggleSearchResult('flex');
+}
+
+
+
+const loadMealDetail = authorKey => {
+    //console.log(mealId);
+
+    const url = `http://openlibrary.org/search.json?q=${authorKey}`;
+    fetch(url)
+        .then(res => res.json())
+        .then(data => displayMealDetail(data.docs[0]))
+
+}
+
+const displayMealDetail = doc => {
+    //console.log(doc);
+    const mealDetails = document.getElementById('meal-details');
+    mealDetails.textContent = '';
+    const div = document.createElement('div');
+    div.classList.add('card');
+    div.innerHTML = `
+   <div class="card img-fluid rounded-3">
+   <img src="https://covers.openlibrary.org/b/id/${doc.cover_i ? doc.cover_i : ''}-M.jpg" alt="">
+   <div class="card-body">
+   <h1 class="card-title">${doc.title}</h1>
+   <h6>By ${doc.author_name ? doc.author_name : ''} </h6>
+   <span>Publisher: ${doc.publisher ? doc.publisher : ''}</span>
+   <br>
+   <span>First Publish in ${doc.first_publish_year ? doc.first_publish_year : ''}</span>
+   <br>
+   <button class="btn btn-primary">Read Book</button>
+   </div>
+   <div>
+   `;
+    mealDetails.appendChild(div);
 }
