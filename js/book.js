@@ -8,12 +8,17 @@ const toggleSearchResult = displayStyle => {
     document.getElementById('search-result').style.display = displayStyle;
 }
 
+const toggleBookDetail = displayStyle => {
+    document.getElementById('book-details').style.display = displayStyle;
+}
+
 const searchBook = () => {
     const searchField = document.getElementById('search-field');
 
     //display spinner
     toggleSpinner('block');
     toggleSearchResult('none');
+    toggleBookDetail('none');
 
     const searchText = searchField.value;
     //clear data
@@ -66,6 +71,7 @@ const displaySearchResult = docs => {
         p.style.color = 'red';
         p.style.textAlign = 'center';
         noResultFound.appendChild(p);
+        toggleBookDetail('none');
 
     }
     else {
@@ -87,7 +93,7 @@ const displaySearchResult = docs => {
         div.classList.add('col');
 
         div.innerHTML = `
-       <div class="card h-75 img-fluid rounded-3">
+       <div onclick="loadBookDetail('${doc.title}')" class="card h-75 img-fluid rounded-3">
        <img src="https://covers.openlibrary.org/b/id/${doc.cover_i ? doc.cover_i : ''}-M.jpg" alt="">
           <div class="card-body">
               <h1 class="card-title">${doc.title}</h1>
@@ -104,3 +110,38 @@ const displaySearchResult = docs => {
     toggleSearchResult('flex');
 }
 
+
+
+const loadBookDetail = bookTitle => {
+
+    const url = `http://openlibrary.org/search.json?q=${bookTitle}`;
+    fetch(url)
+        .then(res => res.json())
+        .then(data => displayBookDetail(data.docs[0]))
+
+}
+
+const displayBookDetail = doc => {
+    //console.log(doc);
+    const bookDetails = document.getElementById('book-details');
+    bookDetails.textContent = '';
+    const div = document.createElement('div');
+    div.classList.add('card');
+    div.innerHTML = `
+   <div class="card img-fluid rounded-3">
+   <img src="https://covers.openlibrary.org/b/id/${doc.cover_i ? doc.cover_i : ''}-M.jpg" alt="">
+   <div class="card-body">
+   <h1 class="card-title">${doc.title}</h1>
+   <h6>By ${doc.author_name ? doc.author_name : ''} </h6>
+   <span>Publisher: ${doc.publisher ? doc.publisher : ''}</span>
+   <br>
+   <span>First Publish in ${doc.first_publish_year ? doc.first_publish_year : ''}</span>
+   <br>
+   <button class="btn btn-primary">Read Book</button>
+   </div>
+   <div>
+   `;
+    bookDetails.appendChild(div);
+    toggleBookDetail('block');
+  
+}
