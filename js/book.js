@@ -39,7 +39,7 @@ const searchBook = () => {
         toggleSpinner('none');
     }
     else {
-        const url = `http://openlibrary.org/search.json?q=${searchText}`;
+        const url = `https://openlibrary.org/search.json?q=${searchText}`;
 
         fetch(url)
             .then(res => res.json())
@@ -114,7 +114,7 @@ const displaySearchResult = docs => {
 
 const loadBookDetail = bookTitle => {
 
-    const url = `http://openlibrary.org/search.json?q=${bookTitle}`;
+    const url = `https://openlibrary.org/search.json?q=${bookTitle}`;
     fetch(url)
         .then(res => res.json())
         .then(data => displayBookDetail(data.docs[0]))
