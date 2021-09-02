@@ -1,83 +1,94 @@
-
-/*
-const searchBook = () => {
-    const url = `http://openlibrary.org/search.json?q=javascript`;
-
-    fetch(url)
-        .then(res => res.json())
-        .then(data => console.log(data.docs))
+const toggleSpinner = displayStyle => {
+    document.getElementById('spinner').style.display = displayStyle;
 }
-searchBook();
-*/
+
+const toggleSearchResult = displayStyle => {
+    document.getElementById('search-result').style.display = displayStyle;
+}
+
 const searchBook = () => {
     const searchField = document.getElementById('search-field');
+
+    //display spinner
+    toggleSpinner('block');
+    toggleSearchResult('none');
+
     const searchText = searchField.value;
     //clear data
     searchField.value = '';
     //load Data
-    const url = `http://openlibrary.org/search.json?q=${searchText}`;
+    const emptyText = document.getElementById('empty-text');
+    emptyText.textContent = '';
+    if (searchText === '') {
+        const p = document.createElement('p');
+        p.innerText = `Please write something to display
+       `;
+        p.style.fontSize = '30px';
+        p.style.color = 'red';
+        p.style.textAlign = 'center';
+        emptyText.appendChild(p);
+        toggleSpinner('none');
+    }
+    else {
+        const url = `http://openlibrary.org/search.json?q=${searchText}`;
 
-    fetch(url)
-        .then(res => res.json())
-        .then(data => displaySearchResult(data.docs))
+        fetch(url)
+            .then(res => res.json())
+            .then(data => displaySearchResult(data.docs))
+    }
 }
-
 const displaySearchResult = docs => {
 
     const searchResult = document.getElementById('search-result');
-
     //clear previuos search data
     //searchResult.innerHTML = '';
     searchResult.textContent = '';
 
-    docs.forEach(doc => {
+    const noResultFound = document.getElementById('noResult-text');
+    noResultFound.textContent = '';
+    if (docs.length === 0) {
+        noResultFound.textContent = '';
+        const p = document.createElement('p');
+        p.innerText = `No result found
+       `;
+        p.style.fontSize = '30px';
+        p.style.color = 'red';
+        p.style.textAlign = 'center';
+        noResultFound.appendChild(p);
 
+    }
+   else{
+    const totalResultFound = document.getElementById('empty-text');
+    totalResultFound.textContent = '';
+    const p = document.createElement('p');
+    p.innerText = `Total result Found ${docs.length}
+   `;
+    p.style.fontSize = '30px';
+    p.style.color = 'blue';
+    p.style.textAlign = 'center';
+    totalResultFound.appendChild(p);
+    searchResult.textContent = '';
+   }
+    docs.forEach(doc => {
         //console.log(doc);
 
         const div = document.createElement('div');
         div.classList.add('col');
 
         div.innerHTML = `
-       <div onclick="loadMealDetail('${doc.cover_i}')" class="card h-100">
-       <img src="..." class="card-img-top" alt="...">
+       <div class="card h-100">
           <div class="card-body">
               <h5 class="card-title">${doc.title}</h5>
-              <span>${doc.author_name ? doc.author_name : ''} </span>
+              <span>By ${doc.author_name ? doc.author_name : ''} </span>
               <br>
-              <span>${doc.publisher ? doc.publisher : ''}</span>
+              <span>Publisher: ${doc.publisher ? doc.publisher : ''}</span>
               <br>
-              <span>${doc.first_publish_year ? doc.first_publish_year : ''}</span>
+              <span>First Publish in ${doc.first_publish_year ? doc.first_publish_year : ''}</span>
             </div>
         </div>`;
         searchResult.appendChild(div);
 
     });
-}
-
-
-const loadMealDetail = cover_i => {
-    //console.log(cover_i);
-
-    const url = `https://covers.openlibrary.org/b/id/${cover_i}-M.jpg`;
-    fetch(url)
-        .then(res => res.json())
-        .then(data => displayMealDetail(data.docs[0]))
-
-}
-
-const displayMealDetail = doc => {
-    //console.log(doc);
-    const mealDetails = document.getElementById('meal-details');
-    const div = document.createElement('div');
-    div.classList.add('card');
-    div.innerHTML = `
-   <div class="card-body">
-   <span>${doc.author_name ? doc.author_name : ''} </span>
-   <br>
-   <span>${doc.publisher ? doc.publisher : ''}</span>
-   <br>
-   <span>${doc.first_publish_year ? doc.first_publish_year : ''}</span>
-   </div>
-   `;
-    mealDetails.appendChild(div);
+    toggleSpinner('none');
+    toggleSearchResult('flex');
 }
